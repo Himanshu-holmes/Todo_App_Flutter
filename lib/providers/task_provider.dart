@@ -4,7 +4,9 @@ import 'package:todo_app/utils/localStorage.dart';
 
 class TaskProvider with ChangeNotifier {
   List<Task> _tasks = [];
-
+  int _index = -1;
+  var _textTitle;
+  bool isEditing = false;
   List<Task> get tasks {
     return [..._tasks];
   }
@@ -24,9 +26,6 @@ class TaskProvider with ChangeNotifier {
     SharedPrefService.saveTodoInLocalStorage(_tasks);
 
     notifyListeners();
-
-    String csv = _tasks.join(',');
-    print(csv);
   }
 
   void removeTask(int index) {
@@ -35,20 +34,20 @@ class TaskProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // void _editTask(index) {
-  //   setState(() {
-  //     _index = index;
-  //     isEditing = true;
-  //     _textConroller.text = _tasks[index].title;
-  //   });
-  // }
+  void editTask(index, textFromController) {
+    if (index < 0) {
+      return;
+    }
 
-  // void _saveTodo() {
-  //   setState(() {
-  //     tasks[_index].title = _textConroller.text;
-  //     SharedPrefService.saveTodoInLocalStorage(_tasks);
-  //     isEditing = false;
-  //     _textConroller.clear();
-  //   });
-  // }
+    _index = index;
+    isEditing = true;
+    _textTitle = textFromController;
+    // _textConroller.text = _tasks[index].title;
+  }
+
+  void saveTodo() {
+    tasks[_index].title = _textTitle;
+    SharedPrefService.saveTodoInLocalStorage(_tasks);
+    isEditing = false;
+  }
 }

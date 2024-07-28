@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:todo_app/models/task.dart';
 import 'package:todo_app/providers/task_provider.dart';
 import 'package:todo_app/utils/localStorage.dart';
-import 'package:uuid/uuid.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,12 +12,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _index = 0;
-  bool isEditing = false;
-
-  final TextEditingController _textConroller = TextEditingController();
-
-  // final tasks = Provider.of<TaskProvider>(listen: ).tasks;
+  final TextEditingController _textController = TextEditingController();
+  // bool isEditing = false;
 
 // lets write addTask Method;
   @override
@@ -69,7 +64,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 icon: const Icon(Icons.delete))),
                         Expanded(
                             child: IconButton(
-                                onPressed: () {}, //_editTask(index),
+                                onPressed: () {
+                                  value.editTask(index, _textController.text);
+                                  _editTask(context, index, value.tasks[index]);
+                                },
                                 icon: const Icon(Icons.edit)))
                       ]),
                     ),
@@ -82,5 +80,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ]))));
+  }
+
+  void _editTask(BuildContext context, int index, Task task) {
+    _textController.text = task.title;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Edit Task"),
+        content: TextField(
+          controller: _textController,
+          decoration: InputDecoration(hintText: "Task Title"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              Provider.of<TaskProvider>(context, listen: false).saveTodo();
+              Navigator.of(context).pop();
+            },
+            child: Text("Save"),
+          ),
+        ],
+      ),
+    );
   }
 }
